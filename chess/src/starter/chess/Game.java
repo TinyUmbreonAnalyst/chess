@@ -14,7 +14,7 @@ public class Game implements ChessGame{
     }
 
     public Game(Game other) {
-        board = other.board;
+        board = new Board((Board) other.board);
         turn = other.turn;
     }
     @Override
@@ -32,7 +32,14 @@ public class Game implements ChessGame{
        if (board.getPiece(startPosition) == null){
            return null;
        }
-        return new Vector<>(board.getPiece(startPosition).pieceMoves(board, startPosition));
+       Vector<ChessMove> list = new Vector<>(board.getPiece(startPosition).pieceMoves(board, startPosition));
+       for(int i = list.size() - 1; i >= 0; --i){
+           Game next = getNextBoard(list.elementAt(i));
+           if(next.isInCheck(board.getPiece(startPosition).getTeamColor())) {
+               list.remove(i);
+           }
+       }
+       return list;
     }
 
 
@@ -63,8 +70,27 @@ public class Game implements ChessGame{
         ChessPiece temp = nBoard.getPiece(move.getStartPosition());
         nBoard.removePiece(move.getStartPosition());
         nBoard.addPiece(move.getEndPosition(), temp);
+        if(move.getPromotionPiece() != null){
+            promote(nBoard, move);
+        }
         next.setBoard(nBoard);
         return next;
+    }
+
+    private void promote(ChessBoard b, ChessMove move) {
+        if(b.getPiece(move.getEndPosition()) == null || b.getPiece(move.getEndPosition()).getPieceType() != ChessPiece.PieceType.PAWN ||
+        move.getPromotionPiece() == ChessPiece.PieceType.KING || move.getPromotionPiece() == ChessPiece.PieceType.PAWN) {
+            return;
+        }
+        ChessPiece piece;
+        switch (move.getPromotionPiece()) {
+            case QUEEN -> piece = new Queen(b.getPiece(move.getEndPosition()).getTeamColor());
+            case ROOK -> piece = new Rook(b.getPiece(move.getEndPosition()).getTeamColor());
+            case KNIGHT -> piece = new Knight(b.getPiece(move.getEndPosition()).getTeamColor());
+            case BISHOP -> piece = new Bishop(b.getPiece(move.getEndPosition()).getTeamColor());
+            default -> {return;}
+        }
+        b.addPiece(move.getEndPosition(), piece);
     }
 
     private void nextTurn() {
@@ -100,6 +126,7 @@ public class Game implements ChessGame{
         for (int i = 1; i < 9; ++i){
             for (int j = 1; j < 9; ++j) {
                 ChessPosition position = new Position(i, j);
+                if(board.getPiece(position) == null) continue;
                 if(board.getPiece(position).getPieceType() == ChessPiece.PieceType.KING && board.getPiece(position).getTeamColor() == teamColor){
                     return position;
                 }

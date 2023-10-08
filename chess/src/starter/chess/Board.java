@@ -10,7 +10,16 @@ public class Board implements ChessBoard{
     }
 
     public Board(Board other) {
-        board = other.board;
+        board = new ChessPiece[8][8];
+        if(other.board == null){
+            board = null;
+        }
+        for (int i = 1; i < 9; ++i){
+            for(int j = 1; j < 9; ++j){
+                ChessPosition pos = new Position(i,j);
+                board[i-1][j-1] = other.getPiece(pos);
+            }
+        }
     }
     @Override
     public void addPiece(ChessPosition position, ChessPiece piece) {

@@ -44,7 +44,7 @@ public class King implements ChessPiece{
         if(downright != null && (board.getPiece(downright) == null || board.getPiece(downright).getTeamColor() != color)) list.add(new Move(myPosition, downright));
         ChessPosition downleft = myPosition.findPosition(-1, -1);
         if(downleft != null && (board.getPiece(downleft) == null || board.getPiece(downleft).getTeamColor() != color)) list.add(new Move(myPosition, downleft));
-        ChessPosition upleft = myPosition.findPosition(-1, 1);
+        ChessPosition upleft = myPosition.findPosition(1, -1);
         if(upleft != null && (board.getPiece(upleft) == null || board.getPiece(upleft).getTeamColor() != color)) list.add(new Move(myPosition, upleft));
         return list;
     }

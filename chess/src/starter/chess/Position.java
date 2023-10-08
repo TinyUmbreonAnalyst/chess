@@ -8,10 +8,6 @@ public class Position implements ChessPosition{
     private int row;
     private int column;
 
-    public Position(){
-        row = 0;
-        column = 0;
-    }
 
     public Position(int r, int c) {
         row = r;
